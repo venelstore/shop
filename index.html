@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>venel-store</title>
-    
     <link rel="icon" type="image/jpeg" href="https://img2.pic.in.th/att.i1s38Cu-IFqrlbGTaNvM6-nuYcIxY7Lpbo_5RvdcKE0.jpeg">
-    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Kanit', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Kanit', 'sans-serif'] 
+                    },
                     colors: { 
                         pastel: { 
                             50: '#f0f8ff',  
@@ -255,8 +253,13 @@
                     <input type="text" id="cfg-logo" placeholder="URL โลโก้" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none">
                     <input type="text" id="cfg-banner" placeholder="URL แบนเนอร์" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none">
                     <input type="text" id="cfg-banner-link" placeholder="ลิงก์แบนเนอร์" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none">
-                    <input type="text" id="cfg-qr" placeholder="URL รูป QR Code สำหรับรับโอนเงิน" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none md:col-span-2">
                     
+                    <div class="md:col-span-2 text-pastel-600 font-bold border-b border-pastel-200 pb-2 mt-4">
+                        <i class="fa-solid fa-qrcode mr-2"></i> ตั้งค่าช่องทางรับเงิน
+                    </div>
+                    <input type="text" id="cfg-qr" placeholder="URL รูป QR Code ธนาคาร" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none">
+                    <input type="text" id="cfg-qr-true" placeholder="URL รูป QR Code ทรูมันนี่วอลเล็ท" class="w-full p-3.5 rounded-[1.5rem] border-2 border-white bg-white/60 focus:bg-white outline-none">
+
                     <div class="md:col-span-2 text-pastel-600 font-bold border-b border-pastel-200 pb-2 mt-4">
                         <i class="fa-solid fa-address-book mr-2"></i> ติดต่อ & แจ้งเตือน
                     </div>
@@ -284,8 +287,8 @@
             <div id="admin-tab-manage" class="admin-content hidden glass cute-card p-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
-                    <div class="bg-white/60 p-5 rounded-[2rem] border-2 border-white">
-                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้า</h3>
+                    <div class="bg-white/60 p-5 rounded-[2rem] border-2 border-white h-fit">
+                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้าใหม่</h3>
                         <form onsubmit="saveManualProduct(event)" class="space-y-4">
                             <select id="man-cat" class="w-full p-3 rounded-[1rem] outline-none shadow-sm text-gray-600">
                                 <option value="แอพพรีเมียม">แอพพรีเมียม</option>
@@ -308,7 +311,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-pastel-600"><i class="fa-solid fa-boxes-stacked mr-2"></i> สินค้าในร้าน</h3>
                         </div>
-                        <div id="admin-product-list" class="space-y-3 max-h-[400px] overflow-y-auto hide-scrollbar"></div>
+                        <div id="admin-product-list" class="space-y-3 max-h-[500px] overflow-y-auto hide-scrollbar"></div>
                     </div>
 
                 </div>
@@ -320,10 +323,17 @@
                 <div class="w-16 h-16 bg-pastel-100 rounded-full flex items-center justify-center mx-auto mb-4 text-pastel-500 text-3xl shadow-inner">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">เติมเครดิต</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">เติมเครดิต</h2>
+                
+                <div class="flex justify-center gap-2 mb-4 bg-white p-1.5 rounded-full shadow-sm border border-pastel-100">
+                    <button type="button" onclick="switchQR('bank')" id="btn-qr-bank" class="flex-1 py-2 rounded-full text-sm font-bold bg-pastel-500 text-white shadow transition">ธนาคาร</button>
+                    <button type="button" onclick="switchQR('true')" id="btn-qr-true" class="flex-1 py-2 rounded-full text-sm font-bold text-gray-500 hover:bg-pastel-100 transition">ทรูมันนี่</button>
+                </div>
+
                 <div class="p-2 bg-white rounded-[2rem] inline-block mb-6 shadow-sm border-2 border-blue-50">
                     <img id="display-qr" src="https://via.placeholder.com/250?text=Scan+QR" class="w-48 h-48 rounded-[1.5rem] object-cover">
                 </div>
+                
                 <form onsubmit="handleTopup(event)" class="text-left space-y-4">
                     <input type="number" id="topup-amount" required placeholder="จำนวนเงิน" class="w-full p-3.5 rounded-[1.5rem] border-2 border-transparent bg-white focus:border-pastel-300 outline-none shadow-sm">
                     <input type="text" id="topup-last6" pattern="^[A-Za-z0-9]{6}$" maxlength="6" required placeholder="เลขท้ายสลิป 6 ตัว" class="w-full p-3.5 rounded-[1.5rem] border-2 border-transparent bg-white focus:border-pastel-300 outline-none shadow-sm uppercase">
@@ -384,7 +394,6 @@
     </div>
 
     <script>
-        // *** เปลี่ยน URL ตรงนี้ด้วยครับ ***
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx5yI25CMMuqz4QyMrXEtaRG6ZrtKHz5p_M9a_AjHS-9s1BXtP7W2HRK9U2VdjqiLfLQQ/exec";
         
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
@@ -396,7 +405,7 @@
         
         document.getElementById('copy-year').innerText = new Date().getFullYear();
 
-        // ------------------ Date formatting (Relative Time) ------------------
+        // ------------------ Date formatting ------------------
         function timeAgo(dateStr) {
             const past = new Date(dateStr).getTime();
             const now = new Date().getTime();
@@ -430,11 +439,13 @@
         // ------------------ Init System ------------------
         window.onload = async () => {
             updateUI();
+            
             const resSet = await fetchGAS({action: 'getSettings'});
             if(resSet.status === 'success') { 
                 appSettings = resSet.data; 
                 applySettings(); 
             }
+            
             await fetchAndRenderProducts();
             await fetchRecentGlobalPurchases(); 
         };
@@ -442,6 +453,7 @@
         // ------------------ Fetch Marquee ------------------
         async function fetchRecentGlobalPurchases() {
             const res = await fetchGAS({ action: 'getRecentGlobalPurchases' });
+            
             if(res.status === 'success' && res.data.length > 0) {
                 let text = res.data.map(item => `ลูกค้า ${item.user} สั่งซื้อ ${item.product} (${timeAgo(item.time)})`).join("  |  ");
                 document.getElementById('marquee-text').innerText = text;
@@ -472,6 +484,7 @@
             if(id === 'inbox') fetchInbox(); 
             if(id === 'history') fetchHistory(); 
             if(id === 'products') renderAllProductsPage(); 
+            if(id === 'topup') switchQR('bank'); 
         }
         
         function navigateAuth(id) { 
@@ -483,22 +496,29 @@
             navigate(id); 
         }
         
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.remove('hidden'); 
+        }
+        
+        function closeModal(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+        }
 
         function openLineContact() { 
             closeMenu(); 
             const link = appSettings['cfg-line'] || appSettings['cfg-page'] || appSettings['cfg-fb']; 
-            if(link) {
+            if(link) { 
                 window.open(link, '_blank'); 
-            } else {
+            } else { 
                 Swal.fire('แจ้งเตือน', 'ยังไม่ได้ตั้งค่าช่องทางการติดต่อ', 'warning'); 
             }
         }
         
         function clickBanner() { 
             const link = appSettings['cfg-banner-link']; 
-            if(link) window.open(link, '_blank'); 
+            if(link) {
+                window.open(link, '_blank'); 
+            }
         }
 
         function requireLogin() { 
@@ -511,7 +531,9 @@
                 confirmButtonColor: '#38bdf8', 
                 showCancelButton: true 
             }).then((res) => { 
-                if(res.isConfirmed) openModal('login-modal'); 
+                if(res.isConfirmed) {
+                    openModal('login-modal'); 
+                }
             }); 
         }
 
@@ -536,9 +558,29 @@
             }
         }
 
+        // ------------------ Topup Switch QR ------------------
+        function switchQR(type) {
+            const btnBank = document.getElementById('btn-qr-bank');
+            const btnTrue = document.getElementById('btn-qr-true');
+            const imgQr = document.getElementById('display-qr');
+            
+            const activeClass = 'flex-1 py-2 rounded-full text-sm font-bold bg-pastel-500 text-white shadow transition';
+            const inactiveClass = 'flex-1 py-2 rounded-full text-sm font-bold text-gray-500 hover:bg-pastel-100 transition';
+
+            if (type === 'bank') {
+                btnBank.className = activeClass;
+                btnTrue.className = inactiveClass;
+                imgQr.src = appSettings['cfg-qr'] || 'https://via.placeholder.com/250?text=Bank+QR';
+            } else {
+                btnTrue.className = activeClass;
+                btnBank.className = inactiveClass;
+                imgQr.src = appSettings['cfg-qr-true'] || 'https://via.placeholder.com/250?text=TrueMoney+QR';
+            }
+        }
+
         // ------------------ Apply Settings ------------------
         function applySettings() {
-            const inputs = ['cfg-name', 'cfg-logo', 'cfg-banner', 'cfg-banner-link', 'cfg-admin-mail', 'cfg-fb', 'cfg-line', 'cfg-page', 'cfg-mail', 'cfg-pop-title', 'cfg-pop-img', 'cfg-pop-desc', 'cfg-qr'];
+            const inputs = ['cfg-name', 'cfg-logo', 'cfg-banner', 'cfg-banner-link', 'cfg-admin-mail', 'cfg-fb', 'cfg-line', 'cfg-page', 'cfg-mail', 'cfg-pop-title', 'cfg-pop-img', 'cfg-pop-desc', 'cfg-qr', 'cfg-qr-true'];
             
             inputs.forEach(id => {
                 if(document.getElementById(id) && appSettings[id]) {
@@ -546,27 +588,41 @@
                 }
             });
             
-            if(appSettings['cfg-logo']) document.getElementById('nav-logo').src = appSettings['cfg-logo'];
-            if(appSettings['cfg-qr']) document.getElementById('display-qr').src = appSettings['cfg-qr'];
+            if(appSettings['cfg-logo']) {
+                document.getElementById('nav-logo').src = appSettings['cfg-logo'];
+            }
             
             const nameStr = appSettings['cfg-name'] || 'venel-store'; 
             nameList = nameStr.split(',').map(s => s.trim()).filter(s => s);
+            
             if(nameList.length > 0) { 
                 document.getElementById('nav-title').innerText = nameList[0]; 
-                // footer-name จะยึดค่าที่ตั้งในแอดมินด้วย
                 document.getElementById('footer-name').innerText = nameList[0]; 
             }
             
             const bannerStr = appSettings['cfg-banner'] || ''; 
             bannerList = bannerStr.split(',').map(s => s.trim()).filter(s => s);
+            
             if(bannerList.length > 0) {
                 document.getElementById('main-banner').src = bannerList[0];
             }
             
-            if(appSettings['cfg-fb']) { document.getElementById('link-fb').href = appSettings['cfg-fb']; document.getElementById('link-fb').classList.remove('hidden'); }
-            if(appSettings['cfg-line']) { document.getElementById('link-line').href = appSettings['cfg-line']; document.getElementById('link-line').classList.remove('hidden'); }
-            if(appSettings['cfg-page']) { document.getElementById('link-page').href = appSettings['cfg-page']; document.getElementById('link-page').classList.remove('hidden'); }
-            if(appSettings['cfg-mail']) { document.getElementById('link-mail').href = appSettings['cfg-mail']; document.getElementById('link-mail').classList.remove('hidden'); }
+            if(appSettings['cfg-fb']) { 
+                document.getElementById('link-fb').href = appSettings['cfg-fb']; 
+                document.getElementById('link-fb').classList.remove('hidden'); 
+            }
+            if(appSettings['cfg-line']) { 
+                document.getElementById('link-line').href = appSettings['cfg-line']; 
+                document.getElementById('link-line').classList.remove('hidden'); 
+            }
+            if(appSettings['cfg-page']) { 
+                document.getElementById('link-page').href = appSettings['cfg-page']; 
+                document.getElementById('link-page').classList.remove('hidden'); 
+            }
+            if(appSettings['cfg-mail']) { 
+                document.getElementById('link-mail').href = appSettings['cfg-mail']; 
+                document.getElementById('link-mail').classList.remove('hidden'); 
+            }
 
             if(bannerList.length > 1) { 
                 setInterval(() => { 
@@ -600,17 +656,17 @@
             let stockBadge = '';
             let btn = '';
             
-            if(p.stock > 0) {
-                stockBadge = `<span class="bg-green-50 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold border border-green-200">ว่าง: ${p.stock}</span>`;
-            } else {
-                stockBadge = `<span class="bg-red-50 text-red-500 text-[10px] px-2 py-0.5 rounded-full font-bold border border-red-200">สินค้าหมด</span>`;
+            if(p.stock > 0) { 
+                stockBadge = `<span class="bg-green-50 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold border border-green-200">ว่าง: ${p.stock}</span>`; 
+            } else { 
+                stockBadge = `<span class="bg-red-50 text-red-500 text-[10px] px-2 py-0.5 rounded-full font-bold border border-red-200">สินค้าหมด</span>`; 
             }
             
             if(currentUser) {
-                if(p.stock > 0) {
-                    btn = `<button onclick="buyProduct('${p.id}', '${p.name}', ${p.price})" class="bg-gradient-to-r from-pastel-400 to-pastel-500 text-white w-9 h-9 rounded-full flex items-center justify-center hover:shadow-md transition"><i class="fa-solid fa-cart-shopping"></i></button>`;
-                } else {
-                    btn = `<button disabled class="bg-gray-200 text-gray-400 w-9 h-9 rounded-full flex items-center justify-center cursor-not-allowed"><i class="fa-solid fa-cart-shopping"></i></button>`;
+                if(p.stock > 0) { 
+                    btn = `<button onclick="buyProduct('${p.id}', '${p.name}', ${p.price})" class="bg-gradient-to-r from-pastel-400 to-pastel-500 text-white w-9 h-9 rounded-full flex items-center justify-center hover:shadow-md transition"><i class="fa-solid fa-cart-shopping"></i></button>`; 
+                } else { 
+                    btn = `<button disabled class="bg-gray-200 text-gray-400 w-9 h-9 rounded-full flex items-center justify-center cursor-not-allowed"><i class="fa-solid fa-cart-shopping"></i></button>`; 
                 }
             } else {
                 btn = `<button onclick="requireLogin()" class="bg-gray-200 text-gray-500 w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-lock"></i></button>`;
@@ -654,6 +710,7 @@
         function renderAllProductsPage() {
             const container = document.getElementById('all-products-container'); 
             container.innerHTML = '';
+            
             const cats = [...new Set(appProducts.map(p => p.category))];
             
             cats.forEach(cat => { 
@@ -662,9 +719,11 @@
                         <h3 class="text-xl font-bold text-gray-700 mb-4 ml-2 border-l-4 border-pastel-400 pl-3">${cat}</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 `; 
-                appProducts.filter(p => p.category === cat).forEach(p => {
-                    html += generateProductHTML(p);
+                
+                appProducts.filter(p => p.category === cat).forEach(p => { 
+                    html += generateProductHTML(p); 
                 }); 
+                
                 html += `</div></div>`; 
                 container.innerHTML += html; 
             });
@@ -682,6 +741,7 @@
             
             if(isConfirmed) { 
                 Swal.fire({ title: 'กำลังดำเนินการ...', didOpen: () => Swal.showLoading() }); 
+                
                 const res = await fetchGAS({ 
                     action: 'buyProduct', 
                     userid: currentUser.userid, 
@@ -692,11 +752,13 @@
                 if(res.status === 'success') { 
                     currentUser.balance = res.newBalance; 
                     localStorage.setItem('user_session', JSON.stringify(currentUser)); 
+                    
                     updateUI(); 
                     fetchAndRenderProducts(); 
                     fetchRecentGlobalPurchases(); 
+                    
                     Swal.fire('สำเร็จ', res.message, 'success'); 
-                } else {
+                } else { 
                     Swal.fire('ผิดพลาด', res.message, 'error'); 
                 }
             } 
@@ -723,7 +785,7 @@
                         </div>
                     `; 
                 }); 
-            } else {
+            } else { 
                 box.innerHTML = '<div class="text-center py-10">ยังไม่มีสินค้าในกล่องข้อความค่ะ</div>'; 
             }
         }
@@ -749,7 +811,7 @@
                         </div>
                     `; 
                 }); 
-            } else {
+            } else { 
                 box.innerHTML = '<div class="text-center py-10">ยังไม่มีประวัติการสั่งซื้อค่ะ</div>'; 
             }
         }
@@ -766,6 +828,7 @@
         async function saveWebSettings(e) { 
             e.preventDefault(); 
             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() }); 
+            
             const settings = { 
                 'cfg-name': document.getElementById('cfg-name').value, 
                 'cfg-logo': document.getElementById('cfg-logo').value, 
@@ -779,9 +842,12 @@
                 'cfg-pop-title': document.getElementById('cfg-pop-title').value, 
                 'cfg-pop-img': document.getElementById('cfg-pop-img').value, 
                 'cfg-pop-desc': document.getElementById('cfg-pop-desc').value, 
-                'cfg-qr': document.getElementById('cfg-qr').value 
+                'cfg-qr': document.getElementById('cfg-qr').value, 
+                'cfg-qr-true': document.getElementById('cfg-qr-true').value 
             }; 
+            
             const res = await fetchGAS({ action: 'adminSaveSettings', settings: settings }); 
+            
             if(res.status === 'success') { 
                 appSettings = settings; 
                 applySettings(); 
@@ -792,6 +858,7 @@
         async function saveManualProduct(e) { 
             e.preventDefault(); 
             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() }); 
+            
             const p = { 
                 category: document.getElementById('man-cat').value, 
                 name: document.getElementById('man-name').value, 
@@ -801,7 +868,9 @@
                 stockData: document.getElementById('man-stock').value, 
                 type: 'manual' 
             }; 
+            
             const res = await fetchGAS({ action: 'adminAddProduct', product: p }); 
+            
             if(res.status === 'success') { 
                 Swal.fire('สำเร็จ', res.message, 'success'); 
                 e.target.reset(); 
@@ -812,6 +881,7 @@
         function renderAdminProductList() { 
             const list = document.getElementById('admin-product-list'); 
             list.innerHTML = ''; 
+            
             appProducts.forEach(p => { 
                 list.innerHTML += `
                     <div class="bg-white p-3 rounded-[1rem] border flex justify-between items-center shadow-sm">
@@ -822,12 +892,45 @@
                                 <div class="text-xs text-pastel-500">${p.price} ฿ | ว่าง: ${p.stock}</div>
                             </div>
                         </div>
-                        <button onclick="adminDeleteProduct('${p.id}')" class="text-red-400 bg-red-50 p-2 rounded-lg hover:bg-red-500 hover:text-white transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="openAddStockModal('${p.id}', '${p.name}')" class="text-pastel-500 bg-pastel-50 w-9 h-9 rounded-lg hover:bg-pastel-500 hover:text-white transition flex items-center justify-center">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button onclick="adminDeleteProduct('${p.id}')" class="text-red-400 bg-red-50 w-9 h-9 rounded-lg hover:bg-red-500 hover:text-white transition flex items-center justify-center">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `; 
             }); 
+        }
+
+        async function openAddStockModal(id, name) {
+            const { value: text } = await Swal.fire({
+                title: `เพิ่มสต๊อก: ${name}`,
+                input: 'textarea',
+                inputLabel: 'ใส่รหัสสินค้า 1 รหัส ต่อ 1 บรรทัด',
+                inputPlaceholder: 'รหัสที่ 1\nรหัสที่ 2...',
+                showCancelButton: true,
+                confirmButtonText: 'บันทึกสต๊อก',
+                confirmButtonColor: '#38bdf8'
+            });
+            
+            if (text) {
+                Swal.fire({ title: 'กำลังเพิ่มสต๊อก...', didOpen: () => Swal.showLoading() });
+                const res = await fetchGAS({ 
+                    action: 'adminAddStockExisting', 
+                    productId: id, 
+                    stockData: text 
+                });
+                
+                if (res.status === 'success') {
+                    Swal.fire('สำเร็จ', res.message, 'success');
+                    fetchAndRenderProducts();
+                } else {
+                    Swal.fire('ผิดพลาด', res.message, 'error');
+                }
+            }
         }
         
         async function adminDeleteProduct(id) { 
@@ -842,6 +945,7 @@
             if (isConfirmed) { 
                 Swal.fire({ title: 'กำลังลบ...', didOpen: () => Swal.showLoading() }); 
                 const res = await fetchGAS({ action: 'adminDeleteProduct', productId: id }); 
+                
                 if(res.status === 'success') { 
                     Swal.fire('สำเร็จ', res.message, 'success'); 
                     fetchAndRenderProducts(); 
@@ -853,6 +957,7 @@
         async function handleLogin(e) { 
             e.preventDefault(); 
             Swal.fire({ title: 'กำลังโหลด...', didOpen:()=>Swal.showLoading() }); 
+            
             const res = await fetchGAS({
                 action:'login', 
                 loginId:document.getElementById('login-id').value, 
@@ -866,20 +971,22 @@
                 updateUI(); 
                 renderProductsHome(); 
                 Swal.fire('สำเร็จ', 'เข้าสู่ระบบสำเร็จ', 'success'); 
-            } else {
+            } else { 
                 Swal.fire('ผิดพลาด', res.message, 'error'); 
-            }
+            } 
         }
         
         async function handleRegister(e) { 
             e.preventDefault(); 
             const pass = document.getElementById('reg-pass').value; 
+            
             if(pass !== document.getElementById('reg-confirm').value) { 
                 Swal.fire('แจ้งเตือน', 'รหัสผ่านไม่ตรงกัน', 'warning'); 
                 return; 
             } 
             
             Swal.fire({ title: 'กำลังโหลด...', didOpen:()=>Swal.showLoading() }); 
+            
             const res = await fetchGAS({
                 action:'register', 
                 userid:document.getElementById('reg-id').value, 
@@ -894,9 +1001,9 @@
                 updateUI(); 
                 renderProductsHome(); 
                 Swal.fire('สำเร็จ', 'สมัครสมาชิกสำเร็จ', 'success'); 
-            } else {
+            } else { 
                 Swal.fire('ผิดพลาด', res.message, 'error'); 
-            }
+            } 
         }
         
         function logout() { 
@@ -914,6 +1021,7 @@
             
             reader.onload = async () => { 
                 Swal.fire({ title: 'กำลังอัปโหลด...', didOpen:()=>Swal.showLoading() }); 
+                
                 const res = await fetchGAS({
                     action:'topup', 
                     userid:currentUser.userid, 
@@ -928,10 +1036,11 @@
                     updateUI(); 
                     e.target.reset(); 
                     Swal.fire('สำเร็จ', res.message, 'success'); 
-                } else {
+                } else { 
                     Swal.fire('ผิดพลาด', res.message, 'error'); 
-                }
+                } 
             }; 
+            
             reader.readAsDataURL(file); 
         }
     </script>
