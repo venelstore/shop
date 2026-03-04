@@ -288,7 +288,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <div class="bg-white/60 p-5 rounded-[2rem] border-2 border-white h-fit">
-                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้า</h3>
+                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้าใหม่</h3>
                         <form onsubmit="saveManualProduct(event)" class="space-y-4">
                             <select id="man-cat" class="w-full p-3 rounded-[1rem] outline-none shadow-sm text-gray-600">
                                 <option value="แอพพรีเมียม">แอพพรีเมียม</option>
@@ -651,6 +651,49 @@
             }
         }
 
+        // ------------------ แสดงรายละเอียดสินค้า (Popup) ------------------
+        function showProductDetails(id) {
+            const p = appProducts.find(x => x.id === id);
+            if(!p) return;
+            
+            let stockText = p.stock > 0 ? `ว่าง: ${p.stock}` : 'สินค้าหมด';
+            
+            Swal.fire({
+                html: `
+                    <div class="text-left">
+                        <img src="${p.image}" class="w-full h-48 object-cover rounded-[1.5rem] mb-4 shadow-sm border-2 border-white">
+                        <h2 class="text-xl font-bold text-gray-800 mb-2">${p.name}</h2>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-pastel-600 font-extrabold text-xl">${p.price} ฿</span>
+                            <span class="bg-blue-50 text-blue-500 text-xs px-2 py-1 rounded-full font-bold border border-blue-100">สต๊อก: ${stockText}</span>
+                        </div>
+                        <div class="bg-white/60 p-4 rounded-[1.5rem] border border-blue-50 shadow-inner">
+                            <h4 class="font-bold text-pastel-600 mb-1"><i class="fa-solid fa-circle-info mr-1"></i> รายละเอียดสินค้า</h4>
+                            <p class="text-sm text-gray-600 whitespace-pre-line">${p.details || 'ไม่มีรายละเอียด'}</p>
+                        </div>
+                    </div>
+                `,
+                showCloseButton: true,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-cart-shopping"></i> สั่งซื้อ',
+                confirmButtonColor: '#38bdf8',
+                cancelButtonText: 'ปิด',
+                cancelButtonColor: '#d1d5db'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (currentUser) {
+                        if (p.stock > 0) {
+                            buyProduct(p.id, p.name, p.price);
+                        } else {
+                            Swal.fire('ขออภัย', 'สินค้านี้หมดชั่วคราวค่ะ', 'error');
+                        }
+                    } else {
+                        requireLogin();
+                    }
+                }
+            });
+        }
+
         // ------------------ Render Products & Buy ------------------
         function generateProductHTML(p) {
             let stockBadge = '';
@@ -671,21 +714,36 @@
             } else {
                 btn = `<button onclick="requireLogin()" class="bg-gray-200 text-gray-500 w-9 h-9 rounded-full flex items-center justify-center"><i class="fa-solid fa-lock"></i></button>`;
             }
+            
+            let detailText = p.details ? p.details : 'ไม่มีรายละเอียด';
+            let readMoreBtn = (p.details && p.details.length > 40) ? `<span onclick="showProductDetails('${p.id}')" class="text-[10px] text-pastel-500 font-bold cursor-pointer hover:underline block mt-0.5">ดูรายละเอียดเพิ่มเติม</span>` : '';
 
             return `
                 <div class="glass cute-card p-3 flex flex-col h-full bg-white/60">
-                    <div class="relative w-full h-36 mb-3 rounded-[1.5rem] overflow-hidden bg-white shadow-sm">
-                        <img src="${p.image}" class="w-full h-full object-cover">
+                    <div class="relative w-full h-36 mb-3 rounded-[1.5rem] overflow-hidden bg-white shadow-sm cursor-pointer" onclick="showProductDetails('${p.id}')">
+                        <img src="${p.image}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                         <div class="absolute top-2 right-2">${stockBadge}</div>
                     </div>
-                    <h3 class="font-bold text-gray-800 text-sm line-clamp-1 px-1">${p.name}</h3>
-                    <p class="text-[11px] text-gray-500 line-clamp-2 px-1 mb-2 mt-1 min-h-[33px]">${p.details}</p>
+                    <h3 class="font-bold text-gray-800 text-sm line-clamp-1 px-1 cursor-pointer hover:text-pastel-500" onclick="showProductDetails('${p.id}')">${p.name}</h3>
+                    
+                    <div class="px-1 mb-2 mt-1 min-h-[35px]">
+                        <p class="text-[11px] text-gray-500 line-clamp-2">${detailText}</p>
+                        ${readMoreBtn}
+                    </div>
+                    
                     <div class="mt-auto flex justify-between items-center pt-2 px-1 border-t border-white">
                         <span class="text-pastel-600 font-extrabold text-lg">${p.price} ฿</span>
                         ${btn}
                     </div>
                 </div>
             `;
+        }
+
+        // ฟังก์ชันตัดคำอัจฉริยะ เพื่อหากลุ่มสินค้า (Base Name)
+        function getBaseName(name) {
+            let clean = name.split('-')[0].split('(')[0].split('[')[0].split('|')[0].trim();
+            clean = clean.split(/[0-9]/)[0].trim();
+            return clean || name; 
         }
 
         async function fetchAndRenderProducts() {
@@ -712,7 +770,7 @@
             }
         }
         
-        // จัดกลุ่มสินค้าให้เรียงในกรอบเดียวกันทั้งหมดตามหมวดหมู่
+        // ระบบจัดกลุ่มสินค้าย่อยอัตโนมัติ
         function renderAllProductsPage() {
             const container = document.getElementById('all-products-container'); 
             container.innerHTML = '';
@@ -727,23 +785,35 @@
             
             cats.forEach(cat => { 
                 let html = `
-                    <div class="mb-10 bg-white/40 p-5 rounded-[2rem] border border-blue-50 shadow-sm">
-                        <h2 class="text-2xl font-extrabold text-pastel-600 mb-6 border-b-2 border-blue-100 pb-2">
-                            <i class="fa-solid fa-layer-group mr-2"></i> ${cat}
+                    <div class="mb-10 bg-white/40 p-4 rounded-[2rem] border border-blue-50 shadow-sm">
+                        <h2 class="text-2xl font-extrabold text-pastel-600 mb-6 border-b-2 border-pastel-200 pb-2">
+                            <i class="fa-solid fa-layer-group mr-2"></i> หมวดหมู่: ${cat}
                         </h2>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 `; 
                 
                 let catProducts = appProducts.filter(p => (p.category ? p.category.trim() : 'อื่นๆ') === cat);
+                let subGroups = {};
                 
-                // เรียงสินค้าตามตัวอักษรเพื่อให้อยู่ติดกัน
-                catProducts.sort((a, b) => a.name.localeCompare(b.name, 'th'));
-                
+                // จัดกลุ่มตาม Base Name
                 catProducts.forEach(p => {
-                    html += generateProductHTML(p);
+                    let baseName = getBaseName(p.name);
+                    if(!subGroups[baseName]) subGroups[baseName] = [];
+                    subGroups[baseName].push(p);
                 });
 
-                html += `</div></div>`; 
+                for(const [baseName, prods] of Object.entries(subGroups)) {
+                    html += `
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-gray-600 mb-3 ml-2 border-l-4 border-pastel-400 pl-3">${baseName}</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    `;
+                    prods.forEach(p => { 
+                        html += generateProductHTML(p); 
+                    });
+                    html += `</div></div>`;
+                }
+                
+                html += `</div>`; 
                 container.innerHTML += html; 
             });
         }
