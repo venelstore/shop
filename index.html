@@ -13,7 +13,9 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Kanit', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Kanit', 'sans-serif'] 
+                    },
                     colors: { 
                         pastel: { 
                             50: '#f0f8ff',  
@@ -286,7 +288,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <div class="bg-white/60 p-5 rounded-[2rem] border-2 border-white h-fit">
-                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้าใหม่</h3>
+                        <h3 class="font-bold text-pastel-600 mb-4"><i class="fa-solid fa-plus-circle mr-2"></i> เพิ่มสินค้า</h3>
                         <form onsubmit="saveManualProduct(event)" class="space-y-4">
                             <select id="man-cat" class="w-full p-3 rounded-[1rem] outline-none shadow-sm text-gray-600">
                                 <option value="แอพพรีเมียม">แอพพรีเมียม</option>
@@ -392,7 +394,6 @@
     </div>
 
     <script>
-        // *** วาง URL ของ Apps Script ตรงนี้ ***
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx5yI25CMMuqz4QyMrXEtaRG6ZrtKHz5p_M9a_AjHS-9s1BXtP7W2HRK9U2VdjqiLfLQQ/exec";
         
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
@@ -687,13 +688,6 @@
             `;
         }
 
-        // ฟังก์ชันตัดคำอัจฉริยะ เพื่อหากลุ่มสินค้า (Base Name)
-        function getBaseName(name) {
-            let clean = name.split('-')[0].split('(')[0].split('[')[0].split('|')[0].trim();
-            clean = clean.split(/[0-9]/)[0].trim();
-            return clean || name; 
-        }
-
         async function fetchAndRenderProducts() {
             const resProd = await fetchGAS({action: 'getProducts'});
             if(resProd.status === 'success') { 
@@ -708,54 +702,48 @@
             container.innerHTML = ''; 
             const limit = currentUser ? appProducts.length : 4; 
             
-            for(let i=0; i<Math.min(appProducts.length, limit); i++) {
-                container.innerHTML += generateProductHTML(appProducts[i]); 
-            }
-        }
-        
-        // ระบบจัดกลุ่มสินค้าย่อยอัตโนมัติ
-        function renderAllProductsPage() {
-            const container = document.getElementById('all-products-container'); 
-            container.innerHTML = '';
-            
             if(appProducts.length === 0) {
                 container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีสินค้าในร้าน</div>';
                 return;
             }
 
-            const cats = [...new Set(appProducts.map(p => p.category))];
+            for(let i=0; i<Math.min(appProducts.length, limit); i++) {
+                container.innerHTML += generateProductHTML(appProducts[i]); 
+            }
+        }
+        
+        // จัดกลุ่มสินค้าให้เรียงในกรอบเดียวกันทั้งหมดตามหมวดหมู่
+        function renderAllProductsPage() {
+            const container = document.getElementById('all-products-container'); 
+            container.innerHTML = '';
+            
+            if(appProducts.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-400">ยังไม่มีสินค้าในร้าน</div>';
+                return;
+            }
+
+            const rawCats = appProducts.map(p => p.category ? p.category.trim() : 'อื่นๆ');
+            const cats = [...new Set(rawCats)];
             
             cats.forEach(cat => { 
                 let html = `
-                    <div class="mb-10 bg-white/40 p-4 rounded-[2rem] border border-blue-50">
-                        <h2 class="text-2xl font-extrabold text-pastel-600 mb-6 border-b-2 border-pastel-200 pb-2">
-                            <i class="fa-solid fa-layer-group mr-2"></i> หมวดหมู่: ${cat}
+                    <div class="mb-10 bg-white/40 p-5 rounded-[2rem] border border-blue-50 shadow-sm">
+                        <h2 class="text-2xl font-extrabold text-pastel-600 mb-6 border-b-2 border-blue-100 pb-2">
+                            <i class="fa-solid fa-layer-group mr-2"></i> ${cat}
                         </h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
                 `; 
                 
-                let catProducts = appProducts.filter(p => p.category === cat);
-                let subGroups = {};
+                let catProducts = appProducts.filter(p => (p.category ? p.category.trim() : 'อื่นๆ') === cat);
                 
-                // จัดกลุ่มตาม Base Name
+                // เรียงสินค้าตามตัวอักษรเพื่อให้อยู่ติดกัน
+                catProducts.sort((a, b) => a.name.localeCompare(b.name, 'th'));
+                
                 catProducts.forEach(p => {
-                    let baseName = getBaseName(p.name);
-                    if(!subGroups[baseName]) subGroups[baseName] = [];
-                    subGroups[baseName].push(p);
+                    html += generateProductHTML(p);
                 });
 
-                for(const [baseName, prods] of Object.entries(subGroups)) {
-                    html += `
-                        <div class="mb-6">
-                            <h3 class="text-lg font-bold text-gray-600 mb-3 ml-2 border-l-4 border-pastel-400 pl-3">${baseName}</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    `;
-                    prods.forEach(p => { 
-                        html += generateProductHTML(p); 
-                    });
-                    html += `</div></div>`;
-                }
-                
-                html += `</div>`; 
+                html += `</div></div>`; 
                 container.innerHTML += html; 
             });
         }
