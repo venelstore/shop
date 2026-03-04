@@ -13,9 +13,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { 
-                        sans: ['Kanit', 'sans-serif'] 
-                    },
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] },
                     colors: { 
                         pastel: { 
                             50: '#f0f8ff',  
@@ -394,6 +392,7 @@
     </div>
 
     <script>
+        // *** วาง URL ของ Apps Script ตรงนี้ ***
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx5yI25CMMuqz4QyMrXEtaRG6ZrtKHz5p_M9a_AjHS-9s1BXtP7W2HRK9U2VdjqiLfLQQ/exec";
         
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
@@ -688,6 +687,13 @@
             `;
         }
 
+        // ฟังก์ชันตัดคำอัจฉริยะ เพื่อหากลุ่มสินค้า (Base Name)
+        function getBaseName(name) {
+            let clean = name.split('-')[0].split('(')[0].split('[')[0].split('|')[0].trim();
+            clean = clean.split(/[0-9]/)[0].trim();
+            return clean || name; 
+        }
+
         async function fetchAndRenderProducts() {
             const resProd = await fetchGAS({action: 'getProducts'});
             if(resProd.status === 'success') { 
@@ -707,24 +713,49 @@
             }
         }
         
+        // ระบบจัดกลุ่มสินค้าย่อยอัตโนมัติ
         function renderAllProductsPage() {
             const container = document.getElementById('all-products-container'); 
             container.innerHTML = '';
             
+            if(appProducts.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีสินค้าในร้าน</div>';
+                return;
+            }
+
             const cats = [...new Set(appProducts.map(p => p.category))];
             
             cats.forEach(cat => { 
                 let html = `
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-gray-700 mb-4 ml-2 border-l-4 border-pastel-400 pl-3">${cat}</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    <div class="mb-10 bg-white/40 p-4 rounded-[2rem] border border-blue-50">
+                        <h2 class="text-2xl font-extrabold text-pastel-600 mb-6 border-b-2 border-pastel-200 pb-2">
+                            <i class="fa-solid fa-layer-group mr-2"></i> หมวดหมู่: ${cat}
+                        </h2>
                 `; 
                 
-                appProducts.filter(p => p.category === cat).forEach(p => { 
-                    html += generateProductHTML(p); 
-                }); 
+                let catProducts = appProducts.filter(p => p.category === cat);
+                let subGroups = {};
                 
-                html += `</div></div>`; 
+                // จัดกลุ่มตาม Base Name
+                catProducts.forEach(p => {
+                    let baseName = getBaseName(p.name);
+                    if(!subGroups[baseName]) subGroups[baseName] = [];
+                    subGroups[baseName].push(p);
+                });
+
+                for(const [baseName, prods] of Object.entries(subGroups)) {
+                    html += `
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-gray-600 mb-3 ml-2 border-l-4 border-pastel-400 pl-3">${baseName}</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    `;
+                    prods.forEach(p => { 
+                        html += generateProductHTML(p); 
+                    });
+                    html += `</div></div>`;
+                }
+                
+                html += `</div>`; 
                 container.innerHTML += html; 
             });
         }
